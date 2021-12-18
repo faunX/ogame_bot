@@ -44,7 +44,7 @@ def expedition():
             if res['success']:
                 console(f'Expedition sended')
             else:
-                conole(f'Send error: {res["message"]}')
+                console(f'Send error: {res["message"]}')
             time.sleep(1)
             
         ogame.exp_return_time = ogame.get_exp_return_time()
