@@ -5,7 +5,19 @@ import random
 import requests
 from bs4 import BeautifulSoup
 
-class Fleet():
+
+class Planet:
+    def __init__(self, id, type, coords, name):
+        self.id = id
+        self.type = type
+        self.coords = coords
+        self.name = name
+
+    def __repr__(self):
+        return f'<Planet id={self.id}, type={self.type}, coords={self.coords}, name={self.name}>'
+
+
+class Fleet:
     def __init__(self, game):
         self.game = game
         self.s = game.s
@@ -14,7 +26,7 @@ class Fleet():
         self.mission = None
         self.speed = 10
         self.token = None
-        self.from_planet = None
+        self.origin = None
         self.resources = [0,0,0]
         self.holding_time = 1
 
@@ -28,7 +40,7 @@ class Fleet():
         if self.mission is None:
             return {'success': False, 'message': 'Не выбрана миссия'}
 
-        if self.from_planet is None:
+        if self.origin is None:
             return {'success': False, 'message': 'Не выбрана планета вылета'}
 
         if self.token is None:
@@ -37,16 +49,14 @@ class Fleet():
             )
             self.token = re.search('var token = "(.*)";', r.text).group(1)
 
-
-        from_planet = self.game.planets[self.from_planet]
-        target = self.target.split(':')
+        target = self.target.coords.split(':')
 
         data = {
             "token": self.token,
             "galaxy": target[0],
             "system": target[1],
             "position": target[2],
-            "type": "1",
+            "type": self.target.type,
             "metal": self.resources[0],
             "crystal": self.resources[1],
             "deuterium": self.resources[2],
@@ -68,7 +78,7 @@ class Fleet():
                 'action': 'sendFleet',
                 'ajax': '1',
                 'asJson': '1',
-                'cp': from_planet,
+                'cp': self.origin.id,
             },
             headers={
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -90,8 +100,23 @@ class OGame:
         self.s.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0'})
         self.server = None
         self.language = None
-        self.planets = {}
+        self.planets = []
         self.exp_return_time = 0
+
+    def planet(self, coords):
+        for planet in self.planets:
+            if (planet.coords == coords or planet.name == coords) and planet.type == 1:
+                return planet
+        return Planet(None, 1, coords, f'Planet {coords}')
+
+    def moon(self, coords):
+        for planet in self.planets:
+            if (planet.coords == coords or planet.name == coords) and planet.type == 3:
+                return planet
+        return Planet(None, 3, coords, f'Moon {coords}')
+
+    def field(self, coords):
+        return Planet(None, 2, coords, 'Поле обломков')
 
     def login(self, username, password, server, language):
         self.username = username
@@ -214,7 +239,14 @@ class OGame:
         for planet in planets:
             planet_id = int(planet['id'].split('-')[1])
             planet_coords = planet.select_one('.planet-koords').text.replace('[', '').replace(']', '')
-            self.planets.update({planet_coords: planet_id})
+            planet_name = planet.select_one('a.planetlink')['title'].split('[')[0].replace('<b>', '').strip()
+            self.planets.append(Planet(planet_id, 1, planet_coords, planet_name))
+        
+            moon = planet.select_one('a.moonlink')
+            if moon is not None:
+                moon_id = moon['href'].split('cp=')[1]
+                moon_name = moon['title'].split('[')[0].replace('<b>', '').strip()
+                self.planets.append(Planet(moon_id, 3, planet_coords, moon_name))
 
 
     def get_events(self):
@@ -250,9 +282,9 @@ class OGame:
         return 0
 
 
-    def send_res(self, from_planet, to_planet):
+    def send_res(self, origin, target):
         r = self.s.get(f'https://s{self.server}-{self.language}.ogame.gameforge.com/game/index.php',
-            params={'page': 'ingame', 'component': 'fleetdispatch', 'cp': self.planets[from_planet]}
+            params={'page': 'ingame', 'component': 'fleetdispatch', 'cp': origin.id}
         ).text
 
         # fleet_count = int(re.search('var fleetCount = (.*);', r).group(1))
@@ -284,21 +316,21 @@ class OGame:
         else:
             resources = [0, 0, res_d-ship_capacity]
 
-        print(from_planet, resources)
+        print(origin.coords, resources)
 
         fleet = Fleet(self)
-        fleet.from_planet = from_planet
-        fleet.target = to_planet
+        fleet.origin = origin
+        fleet.target = target
         fleet.mission = 3
         fleet.ships = {'am203': ship_count}
         fleet.resources = resources
         res = fleet.send()
         print(res)
 
-    def send_exp(self, from_planet, to_planet, ships):
+    def send_exp(self, origin, target, ships):
         fleet = Fleet(self)
-        fleet.from_planet = from_planet
-        fleet.target = to_planet
+        fleet.origin = origin
+        fleet.target = target
         fleet.mission = 15
         fleet.ships = ships
         res = fleet.send()
@@ -329,18 +361,24 @@ if __name__ == '__main__':
     # Загрузка списка планет (обязательно после авторизации)
     # ogame.load_planets()
 
+    # Параметры origin и target:
+    # print(ogame.planet('4:200:15')) # Планета по координатам
+    # print(ogame.planet('Главная планета')) # Планета по названию
+    # print(ogame.moon('4:200:15')) # Луна
+    # print(ogame.field('4:200:15')) # Поле обломков
+
     # Пересылка всех ресурсов на главную планету
-    # ogame.send_res(from_planet='4:200:8', to_planet='4:200:15')
-    # ogame.send_res(from_planet='4:200:9', to_planet='4:200:15')
-    # ogame.send_res(from_planet='4:200:10', to_planet='4:200:15')
-    # ogame.send_res(from_planet='4:200:11', to_planet='4:200:15')
-    # ogame.send_res(from_planet='4:200:12', to_planet='4:200:15')
-    # ogame.send_res(from_planet='4:200:13', to_planet='4:200:15')
+    # ogame.send_res(origin=ogame.planet('4:200:8'), target=ogame.planet('4:200:15'))
+    # ogame.send_res(origin=ogame.planet('4:200:9'), target=ogame.planet('4:200:15'))
+    # ogame.send_res(origin=ogame.planet('4:200:10'), target=ogame.planet('4:200:15'))
+    # ogame.send_res(origin=ogame.planet('4:200:11'), target=ogame.planet('4:200:15'))
+    # ogame.send_res(origin=ogame.planet('4:200:12'), target=ogame.planet('4:200:15'))
+    # ogame.send_res(origin=ogame.planet('4:200:13'), target=ogame.planet('4:200:15'))
 
     # Можно отправлять флоты так
     # fleet = Fleet(ogame)
-    # fleet.from_planet = '4:200:15'
-    # fleet.target = '4:200:11'
+    # fleet.origin = ogame.planet('4:200:15')
+    # fleet.target = ogame.planet('4:200:11')
     # fleet.mission = 3
     # fleet.ships = {'am203': 38}
     # fleet.resources = [928000, 464000, 0]
@@ -359,7 +397,7 @@ if __name__ == '__main__':
     # }
 
     # Отправка экспедиции
-    # ogame.send_exp(from_planet='4:200:15', to_planet='4:200:16', exp_ships)
+    # ogame.send_exp(origin=ogame.planet('4:200:15'), target=ogame.planet('4:200:16'), ships=exp_ships)
 
     # Полный список кораблей
     # ships = {

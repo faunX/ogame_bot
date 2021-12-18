@@ -40,7 +40,7 @@ def expedition():
             ogame.login_token(auth_token, server=176, language='ru')
 
         while available_exp() != 0:
-            res = ogame.send_exp(from_planet='4:200:15', to_planet='4:200:16', ships=exp_ships)
+            res = ogame.send_exp(origin=ogame.planet('4:200:15'), target=ogame.planet('4:200:16'), ships=exp_ships)
             if res['success']:
                 console(f'Expedition sended')
             else:
