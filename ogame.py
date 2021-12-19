@@ -102,6 +102,7 @@ class OGame:
         self.language = None
         self.planets = []
         self.exp_return_time = 0
+        self.exp_check_time = float('inf')
 
     def planet(self, coords):
         for planet in self.planets:
@@ -279,7 +280,7 @@ class OGame:
         for fleet in fleets:
             if int(fleet['data-mission-type']) == 15 and fleet['data-return-flight'] == 'true':
                 return int(fleet['data-arrival-time'])
-        return 0
+        return int(time.time())+600
 
 
     def send_res(self, origin, target):
