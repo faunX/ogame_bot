@@ -39,11 +39,13 @@ def available_exp(origin):
     available_exp = min(max_exps - exps, max_fleets - fleets)
     console(f'Fleets: {fleets}/{max_fleets} | Exp: {exps}/{max_exps} | Available exp: {available_exp}')
 
-    ships_on_planet = json.loads(re.search('var shipsOnPlanet = (.*);', r).group(1))
-    if not check_ships(ships_on_planet):
-        # Если проблема с кораблями, то следующая проверка через 10 мин
-        ogame.exp_check_time = int(time.time()) + 600
-        return 0
+    # Проверяем корабли, только если есть слот под экспедицию
+    if available_exp > 0:
+        ships_on_planet = json.loads(re.search('var shipsOnPlanet = (.*);', r).group(1))
+        if not check_ships(ships_on_planet):
+            # Если проблема с кораблями, то следующая проверка через 10 мин
+            ogame.exp_check_time = int(time.time()) + 600
+            return 0
 
     return available_exp
 
@@ -66,7 +68,7 @@ def expedition(origin, target):
                 ogame.exp_check_time = int(time.time()) + 600
                 ogame.exp_return_time = min(return_time, ogame.exp_check_time)
                 break
-            time.sleep(1)
+            time.sleep(5)
         else:
             # Минимальное время из проверки по ошибке и следующего возвращения
             ogame.exp_return_time = min(ogame.exp_check_time, ogame.get_exp_return_time())
