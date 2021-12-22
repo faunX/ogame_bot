@@ -86,7 +86,8 @@ def expedition(origin, targets):
 
 
 ogame = OGame()
-ogame.login_token('your_token_here', server=176, language='ru')
+auth_token = 'your_token_here'
+ogame.login_token(auth_token, server=176, language='ru')
 
 origin = ogame.moon('4:200:15')
 targets = [
