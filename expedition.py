@@ -86,11 +86,11 @@ def expedition(origin, target):
 ogame = OGame()
 auth_token = 'your_token_here'
 exp_ships = {
-    'am203': 150, # Большой транспорт
-    'am207': 30, # Линкор
-    'am219': 5, # Первопроходец
-    'am210': 3, # Шпионский зонд
-    'am213': 3, # Уничтожитель
+    'Большой транспорт': 150,
+    'Линкор': 30,
+    'Первопроходец': 5,
+    'Шпионский зонд': 3,
+    'Уничтожитель': 3,
 }
 
 ogame.login_token(auth_token, server=176, language='ru')

@@ -36,6 +36,22 @@ class Fleet:
 
         if self.ships is None:
             return {'success': False, 'message': 'Не выбраны корабли'}
+        else:
+            rename_key(self.ships, 'Лёгкий истребитель', 'am204')
+            rename_key(self.ships, 'Тяжёлый истребитель', 'am205')
+            rename_key(self.ships, 'Крейсер', 'am206')
+            rename_key(self.ships, 'Линкор', 'am207')
+            rename_key(self.ships, 'Линейный крейсер', 'am215')
+            rename_key(self.ships, 'Бомбардировщик', 'am211')
+            rename_key(self.ships, 'Уничтожитель', 'am213')
+            rename_key(self.ships, 'Звезда смерти', 'am214')
+            rename_key(self.ships, 'Жнец', 'am218')
+            rename_key(self.ships, 'Первопроходец', 'am219')
+            rename_key(self.ships, 'Малый транспорт', 'am202')
+            rename_key(self.ships, 'Большой транспорт', 'am203')
+            rename_key(self.ships, 'Колонизатор', 'am208')
+            rename_key(self.ships, 'Переработчик', 'am209')
+            rename_key(self.ships, 'Шпионский зонд', 'am210')
 
         if self.mission is None:
             return {'success': False, 'message': 'Не выбрана миссия'}
@@ -323,7 +339,7 @@ class OGame:
         fleet.origin = origin
         fleet.target = target
         fleet.mission = 3
-        fleet.ships = {'am203': ship_count}
+        fleet.ships = {'Большой транспорт': ship_count}
         fleet.resources = resources
         res = fleet.send()
         print(res)
@@ -336,6 +352,13 @@ class OGame:
         fleet.ships = ships
         res = fleet.send()
         return res
+
+
+def rename_key(dictionary, old_name, new_name):
+    try:
+        dictionary[new_name] = dictionary.pop(old_name)
+    except KeyError:
+        pass
 
 
 if __name__ == '__main__':
@@ -381,20 +404,20 @@ if __name__ == '__main__':
     # fleet.origin = ogame.planet('4:200:15')
     # fleet.target = ogame.planet('4:200:11')
     # fleet.mission = 3
-    # fleet.ships = {'am203': 38}
+    # fleet.ships = {'Большой транспорт': 38}
     # fleet.resources = [928000, 464000, 0]
     # res = fleet.send()
     # print(res['message'])
 
     # Список кораблей для экспедиции
     # exp_ships = {
-    #     'am207': 30, # Линкор
-    #     'am213': 1, # Уничтожитель
-    #     'am219': 1, # Первопроходец
-    #     'am202': 40, # Малый транспорт
-    #     'am203': 150, # Большой транспорт
-    #     'am209': 1, # Переработчик
-    #     'am210': 1 # Шпионский зонд
+    #     'Линкор': 30,
+    #     'Уничтожитель': 1,
+    #     'Первопроходец': 1,
+    #     'Малый транспорт': 40,
+    #     'Большой транспорт': 150,
+    #     'Переработчик': 1,
+    #     'Шпионский зонд': 1,
     # }
 
     # Отправка экспедиции
@@ -402,19 +425,19 @@ if __name__ == '__main__':
 
     # Полный список кораблей
     # ships = {
-    #     'am204': 0, # Лёгкий истребитель (fighterLight)
-    #     'am205': 0, # Тяжёлый истребитель (fighterHeavy)
-    #     'am206': 0, # Крейсер (cruiser)
-    #     'am207': 0, # Линкор (battleship)
-    #     'am215': 0, # Линейный крейсер (interceptor)
-    #     'am211': 0, # Бомбардировщик (bomber)
-    #     'am213': 0, # Уничтожитель (destroyer)
-    #     'am214': 0, # Звезда смерти (deathstar)
-    #     'am218': 0, # Жнец (reaper)
-    #     'am219': 0, # Первопроходец (explorer)
-    #     'am202': 0, # Малый транспорт (transporterSmall)
-    #     'am203': 0, # Большой транспорт (transporterLarge)
-    #     'am208': 0, # Колонизатор (colonyShip)
-    #     'am209': 0, # Переработчик (recycler)
-    #     'am210': 0, # Шпионский зонд (espionageProbe)
+    #     'Лёгкий истребитель': 0, # fighterLight
+    #     'Тяжёлый истребитель': 0, # fighterHeavy
+    #     'Крейсер': 0, # cruiser
+    #     'Линкор': 0, # battleship
+    #     'Линейный крейсер': 0, # interceptor
+    #     'Бомбардировщик': 0, # bomber
+    #     'Уничтожитель': 0, # destroyer
+    #     'Звезда смерти': 0, # deathstar
+    #     'Жнец': 0, # reaper
+    #     'Первопроходец': 0, # explorer
+    #     'Малый транспорт': 0, # transporterSmall
+    #     'Большой транспорт': 0, # transporterLarge
+    #     'Колонизатор': 0, # colonyShip
+    #     'Переработчик': 0, # recycler
+    #     'Шпионский зонд': 0, # espionageProbe
     # }
