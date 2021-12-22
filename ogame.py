@@ -172,7 +172,12 @@ class OGame:
         )
         auth_url = r.json()['url'].replace('\\', '')
         self.s.get(auth_url)
-        return self.check_logged_in()
+
+        if not self.check_logged_in():
+            return False
+
+        self.load_planets()
+        return True
 
 
     def login_token(self, token, server, language):
@@ -207,7 +212,12 @@ class OGame:
         )
         auth_url = r.json()['url'].replace('\\', '')
         self.s.get(auth_url)
-        return self.check_logged_in()
+
+        if not self.check_logged_in():
+            return False
+
+        self.load_planets()
+        return True
 
 
     def check_logged_in(self):
@@ -388,9 +398,6 @@ if __name__ == '__main__':
 
     # Проверка авторизации
     # ogame.check_logged_in()
-
-    # Загрузка списка планет (обязательно после авторизации)
-    # ogame.load_planets()
 
     # Параметры origin и target:
     # print(ogame.planet('4:200:15')) # Планета по координатам
