@@ -36,7 +36,13 @@ def available_exp(origin):
     max_fleets = int(re.search('var maxFleetCount = (.*);', r).group(1))
     exps = int(re.search('var expeditionCount = (.*);', r).group(1))
     max_exps = int(re.search('var maxExpeditionCount = (.*);', r).group(1))
-    available_exp = min(max_exps - exps, max_fleets - fleets)
+
+    # Когда заканиваются доп слоты и флотов больше, чем может быть
+    available_fleets = max(0, max_fleets - fleets)
+    available_exp = max(0, max_exps - exps)
+
+    # Экспедиции доступны, только если есть слоты под флоты
+    available_exp = min(available_exp, available_fleets)
     console(f'Fleets: {fleets}/{max_fleets} | Exp: {exps}/{max_exps} | Available exp: {available_exp}')
 
     # Проверяем корабли, только если есть слот под экспедицию
