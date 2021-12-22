@@ -37,21 +37,7 @@ class Fleet:
         if self.ships is None:
             return {'success': False, 'message': 'Не выбраны корабли'}
         else:
-            rename_key(self.ships, 'Лёгкий истребитель', 'am204')
-            rename_key(self.ships, 'Тяжёлый истребитель', 'am205')
-            rename_key(self.ships, 'Крейсер', 'am206')
-            rename_key(self.ships, 'Линкор', 'am207')
-            rename_key(self.ships, 'Линейный крейсер', 'am215')
-            rename_key(self.ships, 'Бомбардировщик', 'am211')
-            rename_key(self.ships, 'Уничтожитель', 'am213')
-            rename_key(self.ships, 'Звезда смерти', 'am214')
-            rename_key(self.ships, 'Жнец', 'am218')
-            rename_key(self.ships, 'Первопроходец', 'am219')
-            rename_key(self.ships, 'Малый транспорт', 'am202')
-            rename_key(self.ships, 'Большой транспорт', 'am203')
-            rename_key(self.ships, 'Колонизатор', 'am208')
-            rename_key(self.ships, 'Переработчик', 'am209')
-            rename_key(self.ships, 'Шпионский зонд', 'am210')
+            self.ships = self.game.convert_ships(self.ships)
 
         if self.mission is None:
             return {'success': False, 'message': 'Не выбрана миссия'}
@@ -119,6 +105,7 @@ class OGame:
         self.planets = []
         self.exp_return_time = 0
         self.exp_check_time = float('inf')
+        self.exp_coord_counter = 0
 
     def planet(self, coords):
         for planet in self.planets:
@@ -344,6 +331,7 @@ class OGame:
         res = fleet.send()
         print(res)
 
+
     def send_exp(self, origin, target, ships):
         fleet = Fleet(self)
         fleet.origin = origin
@@ -353,6 +341,25 @@ class OGame:
         res = fleet.send()
         return res
 
+
+    def convert_ships(self, ships):
+        rename_key(ships, 'Лёгкий истребитель', 'am204')
+        rename_key(ships, 'Тяжёлый истребитель', 'am205')
+        rename_key(ships, 'Крейсер', 'am206')
+        rename_key(ships, 'Линкор', 'am207')
+        rename_key(ships, 'Линейный крейсер', 'am215')
+        rename_key(ships, 'Бомбардировщик', 'am211')
+        rename_key(ships, 'Уничтожитель', 'am213')
+        rename_key(ships, 'Звезда смерти', 'am214')
+        rename_key(ships, 'Жнец', 'am218')
+        rename_key(ships, 'Первопроходец', 'am219')
+        rename_key(ships, 'Малый транспорт', 'am202')
+        rename_key(ships, 'Большой транспорт', 'am203')
+        rename_key(ships, 'Колонизатор', 'am208')
+        rename_key(ships, 'Переработчик', 'am209')
+        rename_key(ships, 'Шпионский зонд', 'am210')
+        return ships
+    
 
 def rename_key(dictionary, old_name, new_name):
     try:

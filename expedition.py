@@ -56,7 +56,7 @@ def available_exp(origin):
     return available_exp
 
 
-def expedition(origin, target):
+def expedition(origin, targets):
     if int(time.time()) >= ogame.exp_return_time:
         if not ogame.check_logged_in():
             ogame.login_token(auth_token, server=176, language='ru')
@@ -65,16 +65,18 @@ def expedition(origin, target):
         ogame.exp_check_time = float('inf')
 
         while available_exp(origin) != 0:
+            target = targets[ogame.exp_coord_counter % len(targets)]
             res = ogame.send_exp(origin, target, exp_ships)
             if res['success']:
-                console(f'Expedition sended')
+                console(f'Expedition sended to {target.coords}')
+                ogame.exp_coord_counter += 1
             else:
                 console(f'Send error: {res["message"]}')
                 return_time = ogame.get_exp_return_time()
                 ogame.exp_check_time = int(time.time()) + 600
                 ogame.exp_return_time = min(return_time, ogame.exp_check_time)
                 break
-            time.sleep(5)
+            time.sleep(expo_delay)
         else:
             # Минимальное время из проверки по ошибке и следующего возвращения
             ogame.exp_return_time = min(ogame.exp_check_time, ogame.get_exp_return_time())
@@ -85,6 +87,17 @@ def expedition(origin, target):
 
 ogame = OGame()
 auth_token = 'your_token_here'
+
+ogame.login_token(auth_token, server=176, language='ru')
+ogame.load_planets()
+
+origin = ogame.moon('4:200:15')
+targets = [
+    ogame.planet('4:199:16'),
+    ogame.planet('4:200:16'),
+    ogame.planet('4:201:16'),
+]
+
 exp_ships = {
     'Большой транспорт': 150,
     'Линкор': 30,
@@ -93,15 +106,13 @@ exp_ships = {
     'Уничтожитель': 3,
 }
 
-ogame.login_token(auth_token, server=176, language='ru')
-ogame.load_planets()
+expo_delay = 5 # задержка между отправкой флотов
 
-origin = ogame.moon('4:200:15')
-target = ogame.planet('4:200:16')
+exp_ships = ogame.convert_ships(exp_ships)
 
 while True:
     try:
-        expedition(origin, target)
+        expedition(origin, targets)
     except Exception as e:
         console(f'{e}')
     time.sleep(5)
