@@ -19,12 +19,12 @@ def check_ships(ships_on_planet):
     for ship_id, ship_count in list(exp_ships.items()):
         # Если вообще нет кораблей
         if int(ship_id[2:]) not in on_planet_dict:
-            console(f'Send error: no ships {ship_id}')
+            console(f'Send error: no ships {ogame.get_ship_name(ship_id)}')
             return False
         else:
             # Если есть, но меньше, чем надо
             if on_planet_dict[int(ship_id[2:])] < ship_count:
-                console(f'Send error: need more ships {ship_id}')
+                console(f'Send error: need more ships {ogame.get_ship_name(ship_id)}')
                 return False
     return True
 
